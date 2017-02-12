@@ -56,7 +56,7 @@ public class Point implements Comparable<Point> {
         } else if (this.x == that.x) {
           return Double.POSITIVE_INFINITY;
         } else {
-          return (that.y - this.y) / (that.x - this.x);
+          return (that.y - this.y) * 1.0 / (that.x - this.x);
         }
     }
 
@@ -77,14 +77,14 @@ public class Point implements Comparable<Point> {
           return 0;
         } else if (that.y == this.y) {
           if (that.x > this.x) {
-            return 1;
-          } else {
             return -1;
+          } else {
+            return 1;
           }
         } else if (that.y > this.y) {
-          return 1;
-        } else {
           return -1;
+        } else {
+          return 1;
         }
     }
 
@@ -100,8 +100,9 @@ public class Point implements Comparable<Point> {
 
     private class PolarOrder implements Comparator<Point> {
       public int compare(Point p1, Point p2) {
-        double slope1 = slopeTo(p1);
-        double slope2 = slopeTo(p2);
+        Point tmp = new Point(x, y);
+        double slope1 = tmp.slopeTo(p1);
+        double slope2 = tmp.slopeTo(p2);
         if (slope1 == slope2) {
           return 0;
         } else if (slope1 > slope2) {
