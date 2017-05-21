@@ -1,10 +1,4 @@
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.MinPQ;
 import java.util.Iterator;
-
 import java.util.List;
 import java.util.LinkedList;
 
@@ -103,9 +97,40 @@ public class Board {
       }
       return true;
     }
+    private int[][] copyOf(int[][] a) {
+      int[][] res = new int[a.length][];
+      for (int row = 0; row < a.length; row++)
+        res[row] = a[row].clone();
+      return res;
+    }
+    private void swap(int[][] matirx, int rowA, int colA, int rowB, int colB) {
+      int tmp = matirx[rowA][colA];
+      matirx[rowA][colA] = matirx[rowB][colB];
+      matirx[rowB][colB] = tmp;
+    }
     public Iterable<Board> neighbors() {// all neighboring boards
       List<Board> neighbors = new LinkedList<Board>();
-      
+      if (blankRow > 0) {
+        int[][] north = copyOf(board);
+        swap(north, blankRow, blankCol, blankRow - 1, blankCol);
+        neighbors.add(north);
+      }
+      if (blankRow < n - 1) {
+        int[][] south = copyOf(board);
+        swap(south, blankRow, blankCol, blankRow + 1, blankCol);
+        neighbors.add(south);
+      }
+      if (blankCol > 0) {
+        int[][] west = copyOf(board);
+        swap(west, blankRow, blankCol, blankRow, blankCol - 1);
+        neighbors.add(west);
+      }
+      if (blankCol < n - 1) {
+        int[][] east = copyOf(board);
+        swap(east, blankRow, blankCol, blankRow, blankCol + 1);
+        neighbors.add(east);
+      }
+      return neighbors;
     }
     public String toString() {// string representation of this board (in the output format specified below)
       String out = Interger.toString(dimension());
