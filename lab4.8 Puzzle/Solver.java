@@ -1,4 +1,4 @@
-import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.MinPQ;
 import java.util.List;
@@ -18,20 +18,19 @@ public class Solver {
       int cnt = 0;
       while (!pq.isEmpty()) {
         solutionNode = pq.delMin();
-        if (solutionNode.isGoal()) {
+        if (solutionNode.getBoard().isGoal()) {
           isSolvable = true;
           break;
         }
-        LinkedList<Board> neighbors = solutionNode.getBoard().neighbors();
         cnt++;
-        for (Board b : neighbors) {
+        for (Board b : solutionNode.getBoard().neighbors()) {
           if (b.equals(solutionNode))
             continue;
           pq.insert(new SearchNode(b, cnt, solutionNode));
         }
       }
     }
-    private class SearchNode implements Comparable<searchNode> {
+    private class SearchNode implements Comparable<SearchNode> {
       private Board board;
       private SearchNode prev;
       private int moves;
@@ -40,7 +39,7 @@ public class Solver {
         this.moves = moves;
         this.prev = prev;
       }
-      @override
+      @Override
       public int compareTo(SearchNode node) {
         return this.priority() - node.priority();
       }
@@ -61,7 +60,7 @@ public class Solver {
       return isSolvable;
     }
     public int moves(){ // min number of moves to solve initial board; -1 if unsolvable
-      return isSolvable()? soltionNode.getMoves() : -1;
+      return isSolvable()? solutionNode.getMoves() : -1;
     }
     public Iterable<Board> solution() {// sequence of boards in a shortest solution; null if unsolvable
       if (!isSolvable)
