@@ -1,156 +1,197 @@
-import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
-import java.lang.*;
-import edu.princeton.cs.algs4.StdRandom;
+import java.util.List;
 
+/**
+ * @author Zoe Shaw
+ */
 public class Board {
-    private int[][] board;
-    private int n;
+
+    private final int[][] blocks;
+    private final int n;
     private int blankRow;
     private int blankCol;
 
-    public Board(int[][] blocks) {// construct a board from an n-by-n array of blocks
-      int n = blocks.length;
-      for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-          board[i][j] = blocks[i][j];
+    /**
+     * Construct a board from an n-by-n array of blocks
+     * (where blocks[i][j] = block in row i, column j)
+     */
+    public Board(int[][] blocks) {
+
+        if (blocks == null) {
+            throw new NullPointerException();
         }
-      }
-      blankRow = -1;
-      blankCol = -1;
-      for (int i = 0; i < n; i ++)
-        for (int j = 0; j < n; j++)
-          if (board[i][j] == 0) {
-            blankRow = i;
-            blankCol = j;
-          }
+
+        this.blocks = copyOf(blocks);
+        n = blocks.length;
+        blankRow = -1;
+        blankCol = -1;
+
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (blocks[row][col] == 0) {
+                    blankRow = row;
+                    blankCol = col;
+                    return;
+                }
+            }
+        }
     }
 
-    public int dimension() {// board dimension n
-      return n;
+    /**
+     * Board dimension n
+     */
+    public int dimension() {
+        return n;
     }
+
+    /**
+     * Number of blocks out of place
+     */
     public int hamming() {
-      int cnt = 0;
-      int num = 1;
-      for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-          if (board[i][j] != num) cnt++;// number of blocks out of place
-          num++;
+        int result = 0;
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (row == blankRow && col == blankCol) {
+                    continue;
+                }
+                if (manhattan(row, col) != 0) {
+                    result++;
+                }
+            }
         }
-      }
-      return cnt;
-    }
-    public int manhattan() {// sum of Manhattan distances between blocks and goal
-      int cnt = 0;
-      for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-          if (board[i][j] == 0) continue;
-          if (board[i][j] == 1) {
-            cnt += Math.abs(0 - i) + Math.abs(0 - j);
-          } else if (board[i][j] == 2) {
-            cnt += Math.abs(0 - i) + Math.abs(1 - j);
-          } else if (board[i][j] == 3) {
-            cnt += Math.abs(0 - i) + Math.abs(2 - j);
-          } else if (board[i][j] == 4) {
-            cnt += Math.abs(1 - i) + Math.abs(0 - j);
-          } else if (board[i][j] == 5) {
-            cnt += Math.abs(1 - i) + Math.abs(1 - j);
-          } else if (board[i][j] == 6) {
-            cnt += Math.abs(1 - i) + Math.abs(2 - j);
-          } else if (board[i][j] == 7) {
-            cnt += Math.abs(2 - i) + Math.abs(0 - j);
-          } else if (board[i][j] == 8) {
-            cnt += Math.abs(2 - i) + Math.abs(1 - j);
-          }
-        }
-      }
-      return cnt;
-    }
-    public boolean isGoal() {// is this board the goal board?
-      int[][] arr = {{1,2,3},{4,5,6},{7,8,}};
-      Board goal = new Board(arr);
-      return goal.equals(board);
-    }
-    public Board twin() {// a board that is obtained by exchanging any pair of blocks
-      int x1, x2, y1, y2;
-      while (true) {
-        x1 = StdRandom.uniform(0, 2);
-        y1 = StdRandom.uniform(0, 2);
-        x2 = StdRandom.uniform(0, 2);
-        y2 = StdRandom.uniform(0, 2);
-        if (x1 == x2 && y1 == y2) continue;
-        else break;
-      }
-      int tmp;
-      tmp = board[x1][y1];
-      board[x1][y1] = board[x2][y2];
-      board[x2][y2] = tmp;
-      return new Board(board);
-    }
-    public boolean equals(Object y) {// does this board equal y?
-      if (y == this)
-         return true;
-      if (y == null)
-         return false;
-      if (this.getClass() != y.getClass())
-         return false;
-      Board that = (Board) y;
-      if (this.blankCol != that.blankCol)
-         return false;
-      if (this.blankRow != that.blankRow)
-         return false;
-      if (this.n != that.n)
-         return false;
-      for (int row = 0; row < n; row++)
-          for (int col = 0; col < n; col++)
-              if (this.board[row][col] != that.board[row][col])
-                 return false;
-      return true;
-    }
-    private int[][] copyOf(int[][] a) {
-      int[][] res = new int[a.length][];
-      for (int row = 0; row < a.length; row++)
-        res[row] = a[row].clone();
-      return res;
-    }
-    private void swap(int[][] matirx, int rowA, int colA, int rowB, int colB) {
-      int tmp = matirx[rowA][colA];
-      matirx[rowA][colA] = matirx[rowB][colB];
-      matirx[rowB][colB] = tmp;
-    }
-    public Iterable<Board> neighbors() {// all neighboring boards
-      List<Board> neighbors = new LinkedList<Board>();
-      if (blankRow > 0) {
-        int[][] north = copyOf(board);
-        swap(north, blankRow, blankCol, blankRow - 1, blankCol);
-        neighbors.add(new Board(north));
-      }
-      if (blankRow < n - 1) {
-        int[][] south = copyOf(board);
-        swap(south, blankRow, blankCol, blankRow + 1, blankCol);
-        neighbors.add(new Board(south));
-      }
-      if (blankCol > 0) {
-        int[][] west = copyOf(board);
-        swap(west, blankRow, blankCol, blankRow, blankCol - 1);
-        neighbors.add(new Board(west));
-      }
-      if (blankCol < n - 1) {
-        int[][] east = copyOf(board);
-        swap(east, blankRow, blankCol, blankRow, blankCol + 1);
-        neighbors.add(new Board(east));
-      }
-      return neighbors;
-    }
-    public String toString() {// string representation of this board (in the output format specified below)
-      String out = Integer.toString(dimension());
-      for (int i = 0; i < dimension(); i++)
-        for (int j = 0; j < dimension(); j++)
-          out += " " + board[i][j];
-        out += "\n";
-      return out;
+        return result;
     }
 
-    public static void main(String[] args) {}
+    /**
+     * Sum of Manhattan distances between blocks and goal
+     */
+    public int manhattan() {
+        int result = 0;
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (row == blankRow && col == blankCol) {
+                    continue;
+                }
+                result += manhattan(row, col);
+            }
+        }
+        return result;
+    }
+
+    private int manhattan(int row, int col) {
+        int destVal = blocks[row][col] - 1;
+        int destRow = destVal / n;
+        int destCol = destVal % n;
+        return Math.abs(destRow - row) + Math.abs(destCol - col);
+    }
+
+    /**
+     * Is this board the goal board?
+     */
+    public boolean isGoal() {
+        return hamming() == 0;
+    }
+
+    /**
+     * A board that is obtained by exchanging any pair of blocks.
+     */
+    public Board twin() {
+        int[][] cloned = copyOf(blocks);
+        if (blankRow != 0) {
+            swap(cloned, 0, 0, 0, 1);
+        } else {
+            swap(cloned, 1, 0, 1, 1);
+        }
+        return new Board(cloned);
+    }
+
+    private void swap(int[][] v, int rowA, int colA, int rowB, int colB) {
+        int swap = v[rowA][colA];
+        v[rowA][colA] = v[rowB][colB];
+        v[rowB][colB] = swap;
+    }
+
+    /**
+     * Does this board equal y?
+     */
+    public boolean equals(Object y) {
+        if (y == this)
+            return true;
+        if (y == null)
+            return false;
+        if (this.getClass() != y.getClass())
+            return false;
+        Board that = (Board) y;
+        if (this.blankCol != that.blankCol)
+            return false;
+        if (this.blankRow != that.blankRow)
+            return false;
+        if (this.n != that.n)
+            return false;
+        for (int row = 0; row < n; row++)
+            for (int col = 0; col < n; col++)
+                if (this.blocks[row][col] != that.blocks[row][col])
+                    return false;
+        return true;
+    }
+
+    private int[][] copyOf(int[][] matrix) {
+        int[][] clone = new int[matrix.length][];
+        for (int row = 0; row < matrix.length; row++) {
+            clone[row] = matrix[row].clone();
+        }
+        return clone;
+    }
+
+    /**
+     * All neighboring boards
+     */
+    public Iterable<Board> neighbors() {
+
+        List<Board> neighbors = new LinkedList<>();
+
+        if (blankRow > 0) {
+            int[][] north = copyOf(blocks);
+            swap(north, blankRow, blankCol, blankRow - 1, blankCol);
+            neighbors.add(new Board(north));
+        }
+        if (blankRow < n - 1) {
+            int[][] south = copyOf(blocks);
+            swap(south, blankRow, blankCol, blankRow + 1, blankCol);
+            neighbors.add(new Board(south));
+        }
+        if (blankCol > 0) {
+            int[][] west = copyOf(blocks);
+            swap(west, blankRow, blankCol, blankRow, blankCol - 1);
+            neighbors.add(new Board(west));
+        }
+        if (blankCol < n - 1) {
+            int[][] east = copyOf(blocks);
+            swap(east, blankRow, blankCol, blankRow, blankCol + 1);
+            neighbors.add(new Board(east));
+        }
+        return neighbors;
+    }
+
+    /**
+     * String representation of this board (in the output format specified
+     * below)
+     */
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(n).append("\n");
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                builder.append(String.format("%2d ", blocks[row][col]));
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Unit tests (not graded)
+     */
+    public static void main(String[] args) {
+    }
 }
