@@ -8,11 +8,11 @@ import java.lang.*;
 /*Brute-force implementation
  */
 public class PointSET {
-	TreeSet<Point2D> treeSet;
+	  private TreeSet<Point2D> treeSet;
     public PointSET() {// construct an empty set of points
     	treeSet = new TreeSet<Point2D>();
     }
-    public boolean isEmpty() {// is the set empty? 
+    public boolean isEmpty() {// is the set empty?
     	return size() == 0 ? true: false;
     }
     public int size() {// number of points in the set
@@ -22,11 +22,11 @@ public class PointSET {
     	if (treeSet.contains(p)) return;
     	treeSet.add(p);
     }
-    public boolean contains(Point2D p) {// does the set contain point p? 
+    public boolean contains(Point2D p) {// does the set contain point p?
     	return treeSet.contains(p);
     }
-    public void draw() {// draw all points to standard draw 
-    	
+    public void draw() {// draw all points to standard draw
+
     }
     public Iterable<Point2D> range(RectHV rect) {// all points that are inside the rectangle
     	List<Point2D> ret = new LinkedList<Point2D>();
@@ -36,7 +36,7 @@ public class PointSET {
     	}
     	return ret;
     }
-    public Point2D nearest(Point2D p) {// a nearest neighbor in the set to point p; null if the set is empty 
+    public Point2D nearest(Point2D p) {// a nearest neighbor in the set to point p; null if the set is empty
     	if (size() == 0)
     		return null;
     	double x = 0.0, y = 0.0;
