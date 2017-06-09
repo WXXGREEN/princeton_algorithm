@@ -1,12 +1,11 @@
+import edu.princeton.cs.algs4.Draw;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.Draw;
-import java.util.*;
 import java.lang.*;
-
-/* 2d-tree implementation:
- * A 2d-tree is a generalization of a BST to two-dimensional keys. 
- * The idea is to build a BST with points in the nodes, 
+import java.util.*;
+/*
+ * A 2d-tree is a generalization of a BST to two-dimensional keys.
+ * The idea is to build a BST with points in the nodes,
  * using the x- and y-coordinates of the points as keys in strictly alternating sequence.
  */
 
@@ -14,7 +13,7 @@ public class KdTree {
 	private Node root;
 	private int size;
 	private enum Separator {HORIZONTAL, VERTICAL};
-	
+
 	private static class Node {
 		private Point2D point;
 		private Node leftBottom;
@@ -44,18 +43,18 @@ public class KdTree {
 					|| (sepr == Separator.VERTICAL && point.x() > q.x());
 		}
 	}
-	
+
     public KdTree() {// construct an empty set of points
     	root = null;
     	size = 0;
     }
-    public boolean isEmpty() {// is the set empty? 
+    public boolean isEmpty() {// is the set empty?
     	return size == 0;
     }
     public int size() {// number of points in the set
     	return size;
     }
-   
+
     public void insert(Point2D p) {// add the point to the set (if it is not already in the set)
     	if (p == null)
     		return;
@@ -81,7 +80,7 @@ public class KdTree {
     	size++;
     	return;
     }
-    public boolean contains(Point2D p) {// does the set contain point p? 
+    public boolean contains(Point2D p) {// does the set contain point p?
     	Node cur = root;
     	if (isEmpty()) return false;
     	while (cur != null) {
@@ -90,8 +89,8 @@ public class KdTree {
     	}
     	return false;
     }
-    public void draw() {// draw all points to standard draw 
-    	
+    public void draw() {// draw all points to standard draw
+
     }
     public Iterable<Point2D> range(RectHV rect) {// all points that are inside the rectangle
     	List<Point2D> res = new ArrayList<Point2D>();
@@ -99,7 +98,7 @@ public class KdTree {
     	return res;
     }
     private void dfsHelper(Node p, RectHV rect, List<Point2D> result) {
-    	if (p == null) 
+    	if (p == null)
     		return;
     	if (rect.contains(p.point)) {
     		result.add(p.point);
@@ -117,10 +116,30 @@ public class KdTree {
     		dfsHelper(p.rightTop, rect, result);
     	}
     }
-    public Point2D nearest(Point2D p) {// a nearest neighbor in the set to point p; null if the set is empty 
-    	Point2D res = p;
-    	return res;
+    public Point2D nearest(Point2D p) {// a nearest neighbor in the set to point p; null if the set is empty
+			if (p == null) return null;
+			return isEmpty()? null : nearest(p, root.point, root);
     }
+		private Point2D nearest(Point2D target, Point2D closest, Node node) {
+			if (node == null)
+			  return closest;
+			//递归查找左子树和右子树，对于可能包含最近邻的点
+			double closDist = closest.distanceTo(target);
+			if (node.rect.distanceTo(target) < closDist) {
+				double nodeDist = node.point.distanceTo(target);
+				if (nodeDist < closDist) {
+					closest = node.point;
+				}
+			}
+			if (node.judgeLeftorRight(target)) {
+				closest = nearest(target, closest, node.leftBottom);
+				closest = nearest(target, closest, node.rightTop);
+			} else {
+				closest = nearest(target, closest, node.rightTop);
+				closest = nearest(target, closest, node.leftBottom);
+			}
+			return closest;
+		}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
